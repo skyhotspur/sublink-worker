@@ -28,6 +28,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
                 return {
                     name: proxy.tag,
                     type: 'ss',
+                    udp: true,
                     server: proxy.server,
                     port: proxy.server_port,
                     cipher: proxy.method,
@@ -74,6 +75,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
                         'grpc-service-name': proxy.transport.service_name,
                     } : undefined,
                     tfo : proxy.tcp_fast_open,
+                    udp : true,
                     'skip-cert-verify': proxy.tls.insecure,
                     'flow': proxy.flow ?? undefined,
                 };
