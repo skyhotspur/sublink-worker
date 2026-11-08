@@ -303,6 +303,24 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
                     ...(minIdleSession !== undefined ? { 'min-idle-session': minIdleSession } : {}),
                 };
             }
+            case 'socks':
+            case 'http': {
+                const isSocks = proxy.type === 'socks';
+                return {
+                    name: proxy.tag,
+                    type: isSocks ? 'socks5' : 'http',
+                    server: proxy.server,
+                    port: proxy.server_port,
+                    ...(proxy.username ? { username: proxy.username } : {}),
+                    ...(proxy.password ? { password: proxy.password } : {}),
+                    ...(isSocks ? { udp: getClashUdpValue(proxy) } : {}),
+                    ...(proxy.tls?.enabled ? {
+                        tls: true,
+                        ...(proxy.tls.server_name ? { sni: proxy.tls.server_name } : {}),
+                        ...(proxy.tls.insecure ? { 'skip-cert-verify': true } : {})
+                    } : {})
+                };
+            }
             default:
                 return proxy; // Return as-is if no specific conversion is defined
         }

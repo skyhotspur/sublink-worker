@@ -394,6 +394,7 @@ export const formLogicFn = (t) => {
                     const queryString = params.toString();
 
                     this.generatedLinks = {
+                        universal: origin + '/sub?' + queryString,
                         xray: origin + '/xray?' + queryString,
                         singbox: origin + '/singbox?' + queryString,
                         clash: origin + '/clash?' + queryString,
@@ -462,6 +463,7 @@ export const formLogicFn = (t) => {
 
                             // Map types to their corresponding path prefixes
                             const prefixMap = {
+                                universal: 'u',
                                 xray: 'x',
                                 singbox: 'b',
                                 clash: 'c',
@@ -512,13 +514,13 @@ export const formLogicFn = (t) => {
                 try {
                     const url = new URL(text);
                     // Check if it matches our short link pattern: /[bcxs]/[code]
-                    const pathMatch = url.pathname.match(/^\/([bcxs])\/([a-zA-Z0-9_-]+)$/);
+                    const pathMatch = url.pathname.match(/^\/([bcxsu])\/([a-zA-Z0-9_-]+)$/);
                     if (pathMatch) {
                         return true;
                     }
 
                     // Check if it's a full subscription URL with query params
-                    const fullMatch = url.pathname.match(/^\/(singbox|clash|xray|surge)$/);
+                    const fullMatch = url.pathname.match(/^\/(singbox|clash|xray|surge|sub)$/);
                     if (fullMatch && url.search) {
                         return true;
                     }
@@ -546,7 +548,7 @@ export const formLogicFn = (t) => {
                     }
 
                     // Check if it's a short link
-                    const shortMatch = urlToParse.pathname.match(/^\/([bcxs])\/([a-zA-Z0-9_-]+)$/);
+                    const shortMatch = urlToParse.pathname.match(/^\/([bcxsu])\/([a-zA-Z0-9_-]+)$/);
 
                     if (shortMatch) {
                         // It's a short link, resolve it first

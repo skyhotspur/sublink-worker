@@ -49,10 +49,12 @@
 ## ✨ Features
 
 ### Supported Protocols
-ShadowSocks • VMess • VLESS • Hysteria2 • Trojan • TUIC
+ShadowSocks • VMess • VLESS • Hysteria2 • Trojan • TUIC • AnyTLS • SOCKS5 • HTTP(S)
 
 ### Client Support
 Sing-Box • Clash • Xray/V2Ray • Surge
+
+**Universal link**: `/sub?config=...` (short link `/u/<code>`) returns the right format for each client automatically — sing-box (incl. SFA/SFI/SFM/SFT) → Sing-Box JSON, Clash/Mihomo/Stash/FlClash → Clash YAML, Surge → Surge config, everything else (v2rayN, Shadowrocket, browsers…) → Base64 share links. Force a format with `&target=singbox|clash|surge|xray`.
 
 ### Input Support
 - Base64 subscriptions

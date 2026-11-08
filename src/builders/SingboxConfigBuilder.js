@@ -53,6 +53,15 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         // Create a shallow copy to avoid mutating the original
         const sanitized = { ...proxy };
 
+        if (sanitized.type === 'socks') {
+            // sing-box socks outbound has no TLS layer; emitting it would make the whole config fail to load
+            if (sanitized.tls?.enabled) return null;
+            delete sanitized.tls;
+        }
+        if (sanitized.type === 'http' && !sanitized.tls?.enabled) {
+            delete sanitized.tls;
+        }
+
         // URI and Clash inputs use Mihomo's kebab-case names, while sing-box
         // rejects those keys and requires its native snake_case options.
         if (sanitized.type === 'anytls') {

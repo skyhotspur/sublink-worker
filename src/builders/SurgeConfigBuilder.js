@@ -128,6 +128,18 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
                     surgeProxy += `, udp-relay-mode=${proxy.udp_relay_mode}`;
                 }
                 break;
+            case 'socks':
+            case 'http': {
+                const tlsOn = !!proxy.tls?.enabled;
+                const kind = proxy.type === 'socks' ? (tlsOn ? 'socks5-tls' : 'socks5') : (tlsOn ? 'https' : 'http');
+                surgeProxy = `${proxy.tag} = ${kind}, ${proxy.server}, ${proxy.server_port}`;
+                // Positional auth is the canonical form accepted by every Surge version
+                if (proxy.username) surgeProxy += `, ${proxy.username}, ${proxy.password ?? ''}`;
+                if (tlsOn && proxy.tls.server_name) surgeProxy += `, sni=${proxy.tls.server_name}`;
+                if (tlsOn && proxy.tls.insecure) surgeProxy += ', skip-cert-verify=true';
+                if (proxy.type === 'socks' && proxy.udp !== false) surgeProxy += ', udp-relay=true';
+                break;
+            }
             default:
                 surgeProxy = `# ${proxy.tag} - Unsupported proxy type: ${proxy.type}`;
         }

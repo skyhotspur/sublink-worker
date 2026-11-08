@@ -68,7 +68,7 @@ export function createApp(bindings = {}) {
         );
     });
 
-    app.get('/singbox', async (c) => {
+    const handleSingbox = async (c) => {
         try {
             const config = c.req.query('config');
             if (!config) {
@@ -122,9 +122,10 @@ export function createApp(bindings = {}) {
         } catch (error) {
             return handleError(c, error, runtime.logger);
         }
-    });
+    };
+    app.get('/singbox', handleSingbox);
 
-    app.get('/clash', async (c) => {
+    const handleClash = async (c) => {
         try {
             const config = c.req.query('config');
             if (!config) {
@@ -171,9 +172,10 @@ export function createApp(bindings = {}) {
         } catch (error) {
             return handleError(c, error, runtime.logger);
         }
-    });
+    };
+    app.get('/clash', handleClash);
 
-    app.get('/surge', async (c) => {
+    const handleSurge = async (c) => {
         try {
             const config = c.req.query('config');
             if (!config) {
@@ -215,7 +217,8 @@ export function createApp(bindings = {}) {
         } catch (error) {
             return handleError(c, error, runtime.logger);
         }
-    });
+    };
+    app.get('/surge', handleSurge);
 
     app.get('/subconverter', (c) => {
         try {
@@ -260,7 +263,7 @@ export function createApp(bindings = {}) {
         }
     });
 
-    app.get('/xray', async (c) => {
+    const handleXray = async (c) => {
         const inputString = c.req.query('config');
         if (!inputString) {
             return c.text('Missing config parameter', 400);
@@ -308,6 +311,14 @@ export function createApp(bindings = {}) {
         }
 
         return c.text(encodeBase64(finalString), 200, responseHeaders);
+    };
+    app.get('/xray', handleXray);
+
+    // One URL for every client: pick the output format from ?target= or the client's User-Agent
+    const targetHandlers = { singbox: handleSingbox, clash: handleClash, surge: handleSurge, xray: handleXray };
+    app.get('/sub', (c) => {
+        const target = resolveSubscriptionTarget(c.req.query('target'), getRequestHeader(c.req, 'User-Agent'));
+        return targetHandlers[target](c);
     });
 
     app.get('/shorten-v2', async (c) => {
@@ -350,6 +361,7 @@ export function createApp(bindings = {}) {
     app.get('/b/:code', redirectHandler('singbox'));
     app.get('/c/:code', redirectHandler('clash'));
     app.get('/x/:code', redirectHandler('xray'));
+    app.get('/u/:code', redirectHandler('sub'));
 
     app.post('/config', async (c) => {
         try {
@@ -382,13 +394,13 @@ export function createApp(bindings = {}) {
 
             const prefix = pathParts[1];
             const shortCode = pathParts[2];
-            if (!['b', 'c', 'x', 's'].includes(prefix)) return c.text(t('invalidShortUrl'), 400);
+            if (!['b', 'c', 'x', 's', 'u'].includes(prefix)) return c.text(t('invalidShortUrl'), 400);
 
             const shortLinks = requireShortLinkService(services.shortLinks);
             const originalParam = await shortLinks.resolveShortCode(shortCode);
             if (!originalParam) return c.text(t('shortUrlNotFound'), 404);
 
-            const mapping = { b: 'singbox', c: 'clash', x: 'xray', s: 'surge' };
+            const mapping = { b: 'singbox', c: 'clash', x: 'xray', s: 'surge', u: 'sub' };
             const originalUrl = `${urlObj.origin}/${mapping[prefix]}${originalParam}`;
             return c.json({ originalUrl });
         } catch (error) {
@@ -429,6 +441,34 @@ export function parseSelectedRules(raw) {
         console.warn(`Failed to parse selectedRules: ${raw}, falling back to minimal`);
         return PREDEFINED_RULE_SETS.minimal;
     }
+}
+
+const TARGET_ALIASES = {
+    singbox: 'singbox', 'sing-box': 'singbox', sb: 'singbox',
+    clash: 'clash', mihomo: 'clash', meta: 'clash', stash: 'clash',
+    surge: 'surge',
+    xray: 'xray', v2ray: 'xray', base64: 'xray', v2rayn: 'xray', shadowrocket: 'xray'
+};
+
+// Order matters: e.g. "ClashMetaForAndroid" must hit clash before any generic match,
+// and sing-box GUI clients (SFA/SFI/SFM/SFT) report their own app names.
+const UA_TARGET_RULES = [
+    [/sing-box|\bSF[AIMT]\//i, 'singbox'],
+    [/clash|mihomo|stash|nyanpasu|flclash/i, 'clash'],
+    [/surge/i, 'surge']
+];
+
+export function resolveSubscriptionTarget(target, userAgent) {
+    const normalized = typeof target === 'string' ? target.trim().toLowerCase() : '';
+    if (normalized && TARGET_ALIASES[normalized]) {
+        return TARGET_ALIASES[normalized];
+    }
+    if (typeof userAgent === 'string' && userAgent) {
+        const hit = UA_TARGET_RULES.find(([pattern]) => pattern.test(userAgent));
+        if (hit) return hit[1];
+    }
+    // Base64 share-link list is the lowest common denominator (v2rayN, Shadowrocket, Quantumult X, Loon, browsers...)
+    return 'xray';
 }
 
 function parseJsonArray(raw) {

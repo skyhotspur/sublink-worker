@@ -270,15 +270,23 @@ export function parseServerInfo(serverInfo) {
 }
 
 export function parseUrlParams(url) {
-	const [, rest] = url.split('://');
-	const [addressPart, ...remainingParts] = rest.split('?');
-	const paramsPart = remainingParts.join('?');
+	const rest = url.slice(url.indexOf('://') + 3);
+	// Fragment must be split off first: links without a query (e.g. trojan://pw@host:443#name)
+	// would otherwise leak the name into the address and lose the tag.
+	const hashIndex = rest.indexOf('#');
+	const beforeFragment = hashIndex === -1 ? rest : rest.slice(0, hashIndex);
+	const fragment = hashIndex === -1 ? '' : rest.slice(hashIndex + 1);
 
-	const [paramsOnly, ...fragmentParts] = paramsPart.split('#');
+	const queryIndex = beforeFragment.indexOf('?');
+	let addressPart = queryIndex === -1 ? beforeFragment : beforeFragment.slice(0, queryIndex);
+	const paramsOnly = queryIndex === -1 ? '' : beforeFragment.slice(queryIndex + 1);
+	// Many panels emit host:port/?query; the trailing slash is not part of the port
+	addressPart = addressPart.replace(/\/+$/, '');
+
 	const searchParams = new URLSearchParams(paramsOnly);
 	const params = Object.fromEntries(searchParams.entries());
 
-	let name = fragmentParts.length > 0 ? fragmentParts.join('#') : '';
+	let name = fragment;
 	try {
 		name = decodeURIComponent(name);
 	} catch (error) { };

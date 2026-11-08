@@ -43,6 +43,17 @@ function parseBool(value) {
     return false;
 }
 
+// Surge allows auth either positionally (server, port, user, pass) or as username=/password= keys
+function positionalAuth(parts, params) {
+    const positional = parts.slice(3).filter(part => !part.includes('='));
+    const username = params.username ?? positional[0];
+    const password = params.password ?? positional[1];
+    return {
+        ...(username ? { username } : {}),
+        ...(password ? { password } : {})
+    };
+}
+
 /**
  * Convert a Surge proxy line to internal (Sing-Box) format
  * @param {string} line - The Surge proxy line
@@ -186,9 +197,40 @@ export function convertSurgeProxyToObject(line) {
             };
 
         case 'http':
-        case 'https':
-            // Skip HTTP/HTTPS proxy types
-            return null;
+        case 'https': {
+            // Surge: Name = http, server, port, username, password (positional or key=value)
+            const tlsOn = type === 'https';
+            return {
+                tag,
+                type: 'http',
+                server,
+                server_port: port,
+                ...positionalAuth(parts, params),
+                tls: tlsOn ? {
+                    enabled: true,
+                    server_name: params.sni || server,
+                    insecure: parseBool(params['skip-cert-verify'])
+                } : undefined
+            };
+        }
+
+        case 'socks5':
+        case 'socks5-tls':
+            return {
+                tag,
+                type: 'socks',
+                server,
+                server_port: port,
+                version: '5',
+                ...positionalAuth(parts, params),
+                tls: type === 'socks5-tls' ? {
+                    enabled: true,
+                    server_name: params.sni || server,
+                    insecure: parseBool(params['skip-cert-verify'])
+                } : undefined,
+                ...(params.udp !== undefined || params['udp-relay'] !== undefined
+                    ? { udp: parseBool(params.udp ?? params['udp-relay']) } : {})
+            };
 
         case 'direct':
         case 'reject':
