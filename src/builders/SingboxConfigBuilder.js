@@ -61,6 +61,10 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         if (sanitized.type === 'http' && !sanitized.tls?.enabled) {
             delete sanitized.tls;
         }
+        // anytls outbound landed in sing-box 1.12; 1.11 rejects the entire config on an unknown type
+        if (sanitized.type === 'anytls' && this.singboxVersion === '1.11') {
+            return null;
+        }
 
         // URI and Clash inputs use Mihomo's kebab-case names, while sing-box
         // rejects those keys and requires its native snake_case options.

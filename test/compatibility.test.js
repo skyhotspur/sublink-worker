@@ -90,6 +90,20 @@ describe('socks/http output for every client', () => {
         expect(builder.convertProxy({ type: 'socks', tag: 'x', server: 'a', server_port: 1, tls: { enabled: true } })).toBeNull();
     });
 
+    it('sing-box 1.11 skips anytls (unsupported before 1.12) but keeps other nodes', async () => {
+        const input = 'anytls://pw@a.example.com:443?sni=a.example.com#AT\nsocks5://u:p@10.0.0.1:1080#S5';
+        const legacy = new SingboxConfigBuilder(input, [], [], undefined, 'en-US', 'test', false, false, undefined, undefined, '1.11');
+        await legacy.build();
+        expect(legacy.config.outbounds.some(o => o.type === 'anytls')).toBe(false);
+        expect(legacy.config.outbounds.some(o => o.tag === 'S5')).toBe(true);
+        const groupMembers = legacy.config.outbounds.flatMap(o => o.outbounds || []);
+        expect(groupMembers).not.toContain('AT');
+
+        const modern = new SingboxConfigBuilder(input, [], [], undefined, 'en-US', 'test', false, false, undefined, undefined, '1.12');
+        await modern.build();
+        expect(modern.config.outbounds.some(o => o.type === 'anytls' && o.tag === 'AT')).toBe(true);
+    });
+
     it('Clash emits socks5 proxy', async () => {
         const builder = new ClashConfigBuilder('socks5://u:p@10.0.0.1:1080#S5', [], [], undefined, 'en-US', 'test');
         await builder.build();
