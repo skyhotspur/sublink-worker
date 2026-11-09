@@ -1,36 +1,57 @@
-import {checkStartsWith} from "../utils";
+import { APP_NAME } from '../constants.js';
+import { checkStartsWith } from "../utils.js";
+
 // 定义语言包
-const translations = {
+export const translations = {
   'zh-CN': {
+    enableClashUI: '启用 Clash API',
+    enableClashUITip: '在 SingBox 配置中启用 Clash API (支持 Dashboard 面板)，默认端口 9090',
+    externalController: '外部控制端口',
+    externalControllerPlaceholder: '默认 0.0.0.0:9090',
+    externalUiDownloadUrl: 'Clash UI 下载地址',
+    externalUiDownloadUrlPlaceholder: '默认 zashboard 仓库压缩包地址',
     missingInput: '缺少输入参数',
     missingConfig: '缺少配置参数',
     missingUrl: '缺少URL参数',
     shortUrlNotFound: '短链接未找到',
     invalidShortUrl: '无效的短链接',
+    urlParsedSuccess: '已成功解析订阅链接配置',
     internalError: '内部服务器错误',
     notFound: '未找到',
     invalidFormat: '无效格式：',
     defaultRules: ['广告拦截', '谷歌服务', '国外媒体', '电报消息'],
     configValidationError: '配置验证错误：',
-    pageDescription: 'Sublink Worker - 订阅链接转换工具',
+    pageDescription: `${APP_NAME} - 订阅链接转换工具`,
     pageKeywords: '订阅链接,转换,Xray,SingBox,Clash,Surge',
-    pageTitle: 'Sublink Worker - 订阅链接转换工具',
-    ogTitle: 'Sublink Worker - 订阅链接转换工具',
+    pageTitle: `${APP_NAME} - 订阅链接转换工具`,
+    ogTitle: `${APP_NAME} - 订阅链接转换工具`,
     ogDescription: '一个强大的订阅链接转换工具，支持多种客户端格式',
-    shareUrls: '分享链接',
-    urlPlaceholder: '在此输入分享链接（可直接粘贴之前生成的链接快速解析配置）...',
+    shareUrls: '输入源',
+    urlPlaceholder: '支持粘贴：分享链接、Clash 配置、Sing-Box 配置、Surge 配置...',
     advancedOptions: '高级选项',
     baseConfigSettings: '基础配置设置',
     baseConfigTooltip: '在此处自定义您的基础配置',
     saveConfig: '保存配置',
+    savingConfig: '保存中...',
+    configContentRequired: '请先输入基础配置内容',
     clearConfig: '清除配置',
     convert: '转换',
     clear: '清除',
+    paste: '粘贴',
+    processing: '处理中...',
+    errorGeneratingLinks: '生成链接时出错',
+    confirmClearConfig: '确定要清除配置吗？',
+    confirmClearAll: '确定要清除所有内容吗？',
+    saveConfigSuccess: '配置保存成功！',
     customPath: '自定义路径',
     savedPaths: '已保存的路径',
     shortenLinks: '生成短链接',
     ruleSelection: '规则选择',
     ruleSelectionTooltip: '选择您需要的规则集',
+    copySubconverterUrl: '复制配置地址',
+    copiedSubconverterUrl: '已复制！',
+    subconverterConfigTitle: 'Subconverter 外部配置',
+    subconverterConfigDesc: '根据上方选择的规则和设置，生成 Subconverter 外部配置地址，可直接用于 Subconverter 的 config 参数。',
     custom: '自定义',
     minimal: '最小化',
     balanced: '均衡',
@@ -38,15 +59,18 @@ const translations = {
     addCustomRule: '添加自定义规则',
     customRuleOutboundName: '出站名称*',
     customRuleGeoSite: 'Geo-Site规则集',
-    customRuleGeoSiteTooltip: 'SingBox中的Site规则来自 https://github.com/lyc8503/sing-box-rules，这意味着您的自定义规则必须在该仓库中',
+    customRuleGeoSiteTooltip: 'SingBox中的Site规则来自 https://github.com/MetaCubeX/meta-rules-dat (sing 分支)，这意味着您的自定义规则必须在该仓库中',
     customRuleGeoSitePlaceholder: '例如：google,anthropic',
     customRuleGeoIP: 'Geo-IP规则集',
-    customRuleGeoIPTooltip: 'SingBox中的IP规则来自 https://github.com/lyc8503/sing-box-rules，这意味着您的自定义规则必须在该仓库中',
+    customRuleGeoIPTooltip: 'SingBox中的IP规则来自 https://github.com/MetaCubeX/meta-rules-dat (sing 分支)，这意味着您的自定义规则必须在该仓库中',
     customRuleGeoIPPlaceholder: '例如：private,cn',
     customRuleDomainSuffix: '域名后缀',
     customRuleDomainSuffixPlaceholder: '域名后缀（用逗号分隔）',
     customRuleDomainKeyword: '域名关键词',
     customRuleDomainKeywordPlaceholder: '域名关键词（用逗号分隔）',
+    customRuleSrcIPCIDR: '来源 IP CIDR',
+    customRuleSrcIPCIDRTooltip: '按来源 IP 分流（Clash/OpenClash：SRC-IP-CIDR；Sing-Box：source_ip_cidr；Surge：仅支持单个 IP，/32 会自动降级为 SRC-IP）',
+    customRuleSrcIPCIDRPlaceholder: '来源 IP CIDR（用逗号分隔）',
     customRuleIPCIDR: 'IP CIDR',
     customRuleIPCIDRPlaceholder: 'IP CIDR（用逗号分隔）',
     customRuleProtocol: '协议类型',
@@ -57,13 +81,17 @@ const translations = {
     customRuleJSON: 'JSON规则',
     customRuleJSONTooltip: '使用JSON格式添加自定义规则，支持批量添加',
     customRulesSection: '自定义规则',
-    customRulesSectionTooltip: '创建自定义路由规则来控制特定流量的路由行为。支持表单和JSON两种编辑方式，可以相互转换。',
+    customRulesSectionTooltip: '创建自定义路由规则来控制特定流量的路由行为。',
     customRulesForm: '表单视图',
     customRulesJSON: 'JSON视图',
     customRule: '自定义规则',
     convertToJSON: '转换为JSON',
     convertToForm: '转换为表单',
     validateJSON: '验证JSON',
+    validateConfig: '验证配置',
+    validJsonConfig: 'JSON 配置格式有效',
+    validYamlConfig: 'YAML 配置格式有效',
+    parserUnavailable: '解析器未就绪，请刷新后重试',
     clearAll: '清空所有',
     addJSONRule: '添加JSON规则',
     noCustomRulesForm: '点击"添加自定义规则"开始创建规则',
@@ -101,41 +129,93 @@ const translations = {
       'Financial': '💰 金融服务',
       'Cloud Services': '☁️ 云服务',
       'Non-China': '🌐 非中国',
+      'Manual Switch': '🖐️ 手动切换',
       'GLOBAL': 'GLOBAL'
     },
+    generalSettings: '通用设置',
+    groupByCountry: '按国家分组',
+    groupByCountryTip: '仅 Clash/Surge/SingBox 生效',
+    includeAutoSelect: '包含自动选择分组',
     UASettings: '自定义UserAgent',
-    UAtip: '默认值curl/7.74.0'
+    UAtip: '默认值curl/7.74.0',
+    subscriptionLinks: '订阅链接',
+    universalLink: '通用订阅链接（按客户端自动识别格式）',
+    xrayLink: 'Xray 链接 (Base64)',
+    singboxLink: 'SingBox 链接',
+    clashLink: 'Clash 链接',
+    surgeLink: 'Surge 链接',
+    copied: '已复制！',
+    shortening: '正在生成短链接...',
+    alreadyShortened: '链接已经是短链接了！',
+    shortenFailed: '生成短链接失败，请重试',
+    customShortCode: '自定义短链接代码',
+    optional: '可选',
+    customShortCodePlaceholder: '留空自动生成，或输入自定义代码',
+    showFullLinks: '显示完整链接',
+    noLinkProvided: '没有提供链接！',
+    scanQRCode: '扫描二维码',
+    tryShortLinks: '请尝试使用短链接！',
+    configSaved: '配置保存成功！',
+    configSaveFailed: '保存配置失败',
+    error: '错误：',
+    validJSON: '有效的JSON',
+    rules: '条规则',
+    rule: '规则',
+    // UpdateChecker
+    newVersionAvailable: '发现新版本',
+    viewRelease: '查看更新',
+    updateGuide: '更新指南',
+    later: '稍后'
   },
   'en-US': {
+    enableClashUI: 'Enable Clash API',
+    enableClashUITip: 'Enable Clash API in SingBox config (Support Dashboard), default port 9090',
+    externalController: 'External Controller',
+    externalControllerPlaceholder: 'Default 0.0.0.0:9090',
+    externalUiDownloadUrl: 'External UI Download URL',
+    externalUiDownloadUrlPlaceholder: 'Default zashboard archive URL',
     missingInput: 'Missing input parameter',
     missingConfig: 'Missing config parameter',
     missingUrl: 'Missing URL parameter',
     shortUrlNotFound: 'Short URL not found',
     invalidShortUrl: 'Invalid short URL',
+    urlParsedSuccess: 'Successfully parsed subscription link configuration',
     internalError: 'Internal Server Error',
     notFound: 'Not Found',
     invalidFormat: 'Invalid format: ',
     defaultRules: ['Ad Blocking', 'Google Services', 'Foreign Media', 'Telegram'],
     configValidationError: 'Config validation error: ',
-    pageDescription: 'Sublink Worker - Subscription Link Converter',
+    pageDescription: `${APP_NAME} - Subscription Link Converter`,
     pageKeywords: 'subscription link,converter,Xray,SingBox,Clash,Surge',
-    pageTitle: 'Sublink Worker - Subscription Link Converter',
-    ogTitle: 'Sublink Worker - Subscription Link Converter',
+    pageTitle: `${APP_NAME} - Subscription Link Converter`,
+    ogTitle: `${APP_NAME} - Subscription Link Converter`,
     ogDescription: 'A powerful subscription link converter supporting multiple client formats',
-    shareUrls: 'Share URLs',
-    urlPlaceholder: 'Enter your share links here (paste previously generated links for quick config parsing)...',
+    shareUrls: 'Input Source',
+    urlPlaceholder: 'Paste share links, Clash config, Sing-Box config, or Surge config...',
     advancedOptions: 'Advanced Options',
     baseConfigSettings: 'Base Config Settings',
     baseConfigTooltip: 'Customize your base configuration here',
     saveConfig: 'Save Config',
+    savingConfig: 'Saving...',
+    configContentRequired: 'Please enter base config content first',
     clearConfig: 'Clear Config',
     convert: 'Convert',
     clear: 'Clear',
+    paste: 'Paste',
+    processing: 'Processing...',
+    errorGeneratingLinks: 'Error generating links',
+    confirmClearConfig: 'Are you sure you want to clear the configuration?',
+    confirmClearAll: 'Are you sure you want to clear all?',
+    saveConfigSuccess: 'Configuration saved successfully!',
     customPath: 'Custom Path',
     savedPaths: 'Saved Paths',
     shortenLinks: 'Generate Short Links',
     ruleSelection: 'Rule Selection',
     ruleSelectionTooltip: 'Select your desired rule sets',
+    copySubconverterUrl: 'Copy Config URL',
+    copiedSubconverterUrl: 'Copied!',
+    subconverterConfigTitle: 'Subconverter External Config',
+    subconverterConfigDesc: 'Generate a Subconverter external config URL based on the rules and settings above, for use as the config parameter in Subconverter.',
     custom: 'Custom',
     minimal: 'Minimal',
     balanced: 'Balanced',
@@ -143,15 +223,18 @@ const translations = {
     addCustomRule: 'Add Custom Rule',
     customRuleOutboundName: 'Outbound Name*',
     customRuleGeoSite: 'Geo-Site Rules',
-    customRuleGeoSiteTooltip: 'SingBox Site rules come from https://github.com/lyc8503/sing-box-rules, which means your custom rules must be in that repository',
+    customRuleGeoSiteTooltip: 'SingBox Site rules come from https://github.com/MetaCubeX/meta-rules-dat (sing branch), which means your custom rules must be in that repository',
     customRuleGeoSitePlaceholder: 'e.g., google,anthropic',
     customRuleGeoIP: 'Geo-IP Rules',
-    customRuleGeoIPTooltip: 'SingBox IP rules come from https://github.com/lyc8503/sing-box-rules, which means your custom rules must be in that repository',
+    customRuleGeoIPTooltip: 'SingBox IP rules come from https://github.com/MetaCubeX/meta-rules-dat (sing branch), which means your custom rules must be in that repository',
     customRuleGeoIPPlaceholder: 'e.g., private,cn',
     customRuleDomainSuffix: 'Domain Suffix',
     customRuleDomainSuffixPlaceholder: 'Domain suffixes (comma separated)',
     customRuleDomainKeyword: 'Domain Keyword',
     customRuleDomainKeywordPlaceholder: 'Domain keywords (comma separated)',
+    customRuleSrcIPCIDR: 'Source IP CIDR',
+    customRuleSrcIPCIDRTooltip: 'Route by source IP (Clash/OpenClash: SRC-IP-CIDR; Sing-Box: source_ip_cidr; Surge: only supports single IP, /32 will be downgraded to SRC-IP)',
+    customRuleSrcIPCIDRPlaceholder: 'Source IP CIDR (comma separated)',
     customRuleIPCIDR: 'IP CIDR',
     customRuleIPCIDRPlaceholder: 'IP CIDR (comma separated)',
     customRuleProtocol: 'Protocol Type',
@@ -169,6 +252,10 @@ const translations = {
     convertToJSON: 'Convert to JSON',
     convertToForm: 'Convert to Form',
     validateJSON: 'Validate JSON',
+    validateConfig: 'Validate Config',
+    validJsonConfig: 'JSON config is valid',
+    validYamlConfig: 'YAML config is valid',
+    parserUnavailable: 'Parser unavailable. Please refresh and try again.',
     clearAll: 'Clear All',
     addJSONRule: 'Add JSON Rule',
     noCustomRulesForm: 'Click "Add Custom Rule" to start creating rules',
@@ -183,7 +270,7 @@ const translations = {
     invalidJSON: 'Invalid JSON format',
     allJSONValid: 'All JSON rules are valid!',
     jsonValidationErrors: 'JSON validation errors',
-    outboundNames:{
+    outboundNames: {
       'Auto Select': '⚡ Auto Select',
       'Node Select': '🚀 Node Select',
       'Fall Back': '🐟 Fall Back',
@@ -205,10 +292,43 @@ const translations = {
       'Financial': '💰 Financial Services',
       'Cloud Services': '☁️ Cloud Services',
       'Non-China': '🌐 Non-China',
+      'Manual Switch': '🖐️ Manual Switch',
       'GLOBAL': 'GLOBAL'
     },
+    generalSettings: 'General Settings',
+    groupByCountry: 'Group by Country',
+    groupByCountryTip: 'Clash/Surge/SingBox only',
+    includeAutoSelect: 'Include Auto Select Group',
     UASettings: 'Custom UserAgent',
-    UAtip: 'By default it will use curl/7.74.0'
+    UAtip: 'By default it will use curl/7.74.0',
+    subscriptionLinks: 'Subscription Links',
+    universalLink: 'Universal Link (format auto-detected per client)',
+    xrayLink: 'Xray Link (Base64)',
+    singboxLink: 'SingBox Link',
+    clashLink: 'Clash Link',
+    surgeLink: 'Surge Link',
+    copied: 'Copied!',
+    shortening: 'Shortening...',
+    alreadyShortened: 'Links are already shortened!',
+    shortenFailed: 'Failed to shorten URLs. Please try again.',
+    customShortCode: 'Custom Short Code',
+    optional: 'Optional',
+    customShortCodePlaceholder: 'Leave empty for auto-generation, or enter custom code',
+    showFullLinks: 'Show Full Links',
+    noLinkProvided: 'No link provided!',
+    scanQRCode: 'Scan QR Code',
+    tryShortLinks: 'Try to use short links!',
+    configSaved: 'Configuration saved successfully!',
+    configSaveFailed: 'Failed to save configuration',
+    error: 'Error: ',
+    validJSON: 'Valid JSON',
+    rules: 'rules',
+    rule: 'Rule',
+    // UpdateChecker
+    newVersionAvailable: 'New Version Available',
+    viewRelease: 'View Release',
+    updateGuide: 'Update Guide',
+    later: 'Later'
   },
   'fa': {
     missingInput: 'پارامتر ورودی وجود ندارد',
@@ -216,30 +336,43 @@ const translations = {
     missingUrl: 'پارامتر URL وجود ندارد',
     shortUrlNotFound: 'لینک کوتاه پیدا نشد',
     invalidShortUrl: 'لینک کوتاه نامعتبر',
+    urlParsedSuccess: 'پیکربندی لینک اشتراک با موفقیت تجزیه شد',
     internalError: 'خطای داخلی سرور',
     notFound: 'یافت نشد',
     invalidFormat: 'فرمت نامعتبر: ',
     defaultRules: ['مسدودسازی تبلیغات', 'سرویس‌های گوگل', 'رسانه‌های خارجی', 'تلگرام'],
     configValidationError: 'خطای اعتبارسنجی پیکربندی: ',
-    pageDescription: 'Sublink Worker - مبدل لینک اشتراک',
+    pageDescription: `${APP_NAME} - مبدل لینک اشتراک`,
     pageKeywords: 'لینک اشتراک,مبدل,Xray,SingBox,Clash,Surge',
-    pageTitle: 'Sublink Worker - مبدل لینک اشتراک',
-    ogTitle: 'Sublink Worker - مبدل لینک اشتراک',
+    pageTitle: `${APP_NAME} - مبدل لینک اشتراک`,
+    ogTitle: `${APP_NAME} - مبدل لینک اشتراک`,
     ogDescription: 'یک مبدل قدرتمند لینک اشتراک با پشتیبانی از فرمت‌های مختلف',
-    shareUrls: 'اشتراک‌گذاری لینک‌ها',
-    urlPlaceholder: 'لینک‌های اشتراک خود را اینجا وارد کنید (برای تجزیه سریع پیکربندی، لینک‌های تولید شده قبلی را جایگذاری کنید)...',
+    shareUrls: 'منبع ورودی',
+    urlPlaceholder: 'لینک‌های اشتراک، پیکربندی Clash، Sing-Box یا Surge را جایگذاری کنید...',
     advancedOptions: 'گزینه‌های پیشرفته',
     baseConfigSettings: 'تنظیمات پیکربندی پایه',
     baseConfigTooltip: 'پیکربندی پایه خود را اینجا سفارشی کنید',
     saveConfig: 'ذخیره پیکربندی',
+    savingConfig: 'در حال ذخیره...',
+    configContentRequired: 'لطفاً ابتدا محتوای پیکربندی پایه را وارد کنید',
     clearConfig: 'پاک کردن پیکربندی',
     convert: 'تبدیل',
     clear: 'پاک کردن',
+    paste: 'چسباندن',
+    processing: 'در حال پردازش...',
+    errorGeneratingLinks: 'خطا در ایجاد لینک‌ها',
+    confirmClearConfig: 'آیا مطمئن هستید که می‌خواهید پیکربندی را پاک کنید؟',
+    confirmClearAll: 'آیا مطمئن هستید که می‌خواهید همه را پاک کنید؟',
+    saveConfigSuccess: 'پیکربندی با موفقیت ذخیره شد!',
     customPath: 'مسیر سفارشی',
     savedPaths: 'مسیرهای ذخیره شده',
     shortenLinks: 'ایجاد لینک‌های کوتاه',
     ruleSelection: 'انتخاب قوانین',
     ruleSelectionTooltip: 'مجموعه قوانین مورد نظر خود را انتخاب کنید',
+    copySubconverterUrl: 'کپی آدرس پیکربندی',
+    copiedSubconverterUrl: 'کپی شد!',
+    subconverterConfigTitle: 'پیکربندی خارجی Subconverter',
+    subconverterConfigDesc: 'آدرس پیکربندی خارجی Subconverter را بر اساس قوانین و تنظیمات بالا ایجاد کنید.',
     custom: 'سفارشی',
     minimal: 'حداقل',
     balanced: 'متعادل',
@@ -247,15 +380,18 @@ const translations = {
     addCustomRule: 'افزودن قانون سفارشی',
     customRuleOutboundName: 'نام خروجی*',
     customRuleGeoSite: 'قوانین Geo-Site',
-    customRuleGeoSiteTooltip: 'قوانین SingBox Site از https://github.com/lyc8503/sing-box-rules می‌آیند، به این معنی که قوانین سفارشی شما باید در آن مخزن باشد',
+    customRuleGeoSiteTooltip: 'قوانین SingBox Site از https://github.com/MetaCubeX/meta-rules-dat (شاخه sing) می‌آیند، به این معنی که قوانین سفارشی شما باید در آن مخزن باشد',
     customRuleGeoSitePlaceholder: 'برای مثال: google,anthropic',
     customRuleGeoIP: 'قوانین Geo-IP',
-    customRuleGeoIPTooltip: 'قوانین SingBox IP از https://github.com/lyc8503/sing-box-rules می‌آیند، به این معنی که قوانین سفارشی شما باید در آن مخزن باشد',
+    customRuleGeoIPTooltip: 'قوانین SingBox IP از https://github.com/MetaCubeX/meta-rules-dat (شاخه sing) می‌آیند، به این معنی که قوانین سفارشی شما باید در آن مخزن باشد',
     customRuleGeoIPPlaceholder: 'برای مثال: private,cn',
     customRuleDomainSuffix: 'پسوند دامنه',
     customRuleDomainSuffixPlaceholder: 'پسوندهای دامنه (با کاما جدا شده)',
     customRuleDomainKeyword: 'کلمه کلیدی دامنه',
     customRuleDomainKeywordPlaceholder: 'کلمات کلیدی دامنه (با کاما جدا شده)',
+    customRuleSrcIPCIDR: 'CIDR IP منبع',
+    customRuleSrcIPCIDRTooltip: 'مسیریابی بر اساس IP منبع (Clash/OpenClash: SRC-IP-CIDR؛ Sing-Box: source_ip_cidr؛ Surge: فقط IP تکی را پشتیبانی می‌کند و /32 به SRC-IP تبدیل می‌شود)',
+    customRuleSrcIPCIDRPlaceholder: 'CIDR IP منبع (با کاما جدا شده)',
     customRuleIPCIDR: 'IP CIDR',
     customRuleIPCIDRPlaceholder: 'IP CIDR (با کاما جدا شده)',
     customRuleProtocol: 'نوع پروتکل',
@@ -273,6 +409,10 @@ const translations = {
     convertToJSON: 'تبدیل به JSON',
     convertToForm: 'تبدیل به فرم',
     validateJSON: 'اعتبارسنجی JSON',
+    validateConfig: 'اعتبارسنجی پیکربندی',
+    validJsonConfig: 'پیکربندی JSON معتبر است',
+    validYamlConfig: 'پیکربندی YAML معتبر است',
+    parserUnavailable: 'تجزیه\u200cگر در دسترس نیست. لطفاً صفحه را تازه\u200cسازی کنید.',
     clearAll: 'پاک کردن همه',
     addJSONRule: 'افزودن قانون JSON',
     noCustomRulesForm: 'روی "افزودن قانون سفارشی" کلیک کنید تا شروع به ایجاد قوانین کنید',
@@ -309,10 +449,43 @@ const translations = {
       'Financial': '💰 سرویس‌های مالی',
       'Cloud Services': '☁️ سرویس‌های ابری',
       'Non-China': '🌐 خارج از چین',
+      'Manual Switch': '🖐️ Manual Switch',
       'GLOBAL': 'GLOBAL'
     },
+    generalSettings: 'تنظیمات عمومی',
+    groupByCountry: 'گروه‌بندی بر اساس کشور',
+    groupByCountryTip: 'فقط Clash/Surge/SingBox',
+    includeAutoSelect: 'شامل گروه انتخاب خودکار',
     UASettings: 'UserAgent سفارشی',
-    UAtip: 'به طور پیش‌فرض از curl/7.74.0 استفاده می‌کند'
+    UAtip: 'به طور پیش‌فرض از curl/7.74.0 استفاده می‌کند',
+    subscriptionLinks: 'لینک‌های اشتراک',
+    universalLink: 'لینک جهانی (تشخیص خودکار قالب بر اساس کلاینت)',
+    xrayLink: 'لینک Xray (Base64)',
+    singboxLink: 'لینک SingBox',
+    clashLink: 'لینک Clash',
+    surgeLink: 'لینک Surge',
+    copied: 'کپی شد!',
+    shortening: 'در حال کوتاه کردن...',
+    alreadyShortened: 'لینک‌ها از قبل کوتاه شده‌اند!',
+    shortenFailed: 'کوتاه کردن URL ناموفق بود. لطفاً دوباره تلاش کنید.',
+    customShortCode: 'کد کوتاه سفارشی',
+    optional: 'اختیاری',
+    customShortCodePlaceholder: 'برای تولید خودکار خالی بگذارید یا کد سفارشی وارد کنید',
+    showFullLinks: 'نمایش لینک‌های کامل',
+    noLinkProvided: 'لینکی ارائه نشده است!',
+    scanQRCode: 'اسکن کد QR',
+    tryShortLinks: 'لطفاً از لینک‌های کوتاه استفاده کنید!',
+    configSaved: 'پیکربندی با موفقیت ذخیره شد!',
+    configSaveFailed: 'ذخیره پیکربندی ناموفق بود',
+    error: 'خطا: ',
+    validJSON: 'JSON معتبر',
+    rules: 'قوانین',
+    rule: 'قانون',
+    // UpdateChecker
+    newVersionAvailable: 'نسخه جدید موجود است',
+    viewRelease: 'مشاهده انتشار',
+    updateGuide: 'راهنمای به‌روزرسانی',
+    later: 'بعداً'
   },
   'ru': {
     missingInput: 'Отсутствует входной параметр',
@@ -320,30 +493,43 @@ const translations = {
     missingUrl: 'Отсутствует параметр URL',
     shortUrlNotFound: 'Короткая ссылка не найдена',
     invalidShortUrl: 'Недопустимая короткая ссылка',
+    urlParsedSuccess: 'Конфигурация ссылки подписки успешно разобрана',
     internalError: 'Внутренняя ошибка сервера',
     notFound: 'Не найдено',
     invalidFormat: 'Недопустимый формат: ',
     defaultRules: ['Блокировка рекламы', 'Сервисы Google', 'Зарубежные медиа', 'Telegram'],
     configValidationError: 'Ошибка проверки конфигурации: ',
-    pageDescription: 'Sublink Worker - инструмент для преобразования ссылок подписки',
+    pageDescription: `${APP_NAME} - инструмент для преобразования ссылок подписки`,
     pageKeywords: 'ссылка подписки,преобразование,Xray,SingBox,Clash,Surge',
-    pageTitle: 'Sublink Worker - инструмент для преобразования ссылок подписки',
-    ogTitle: 'Sublink Worker - инструмент для преобразования ссылок подписки',
+    pageTitle: `${APP_NAME} - инструмент для преобразования ссылок подписки`,
+    ogTitle: `${APP_NAME} - инструмент для преобразования ссылок подписки`,
     ogDescription: 'Мощный инструмент для преобразования ссылок подписки, поддерживающий различные форматы клиентов',
-    shareUrls: 'Поделиться ссылками',
-    urlPlaceholder: 'Введите здесь ваши ссылки (вставьте ранее созданные ссылки для быстрого разбора конфигурации)...',
+    shareUrls: 'Источник ввода',
+    urlPlaceholder: 'Вставьте ссылки, конфигурацию Clash, Sing-Box или Surge...',
     advancedOptions: 'Расширенные настройки',
     baseConfigSettings: 'Базовые настройки конфигурации',
     baseConfigTooltip: 'Настройте базовую конфигурацию здесь',
     saveConfig: 'Сохранить конфигурацию',
+    savingConfig: 'Сохранение...',
+    configContentRequired: 'Сначала введите содержимое базовой конфигурации',
     clearConfig: 'Очистить конфигурацию',
     convert: 'Преобразовать',
     clear: 'Очистить',
+    paste: 'Вставить',
+    processing: 'Обработка...',
+    errorGeneratingLinks: 'Ошибка при создании ссылок',
+    confirmClearConfig: 'Вы уверены, что хотите очистить конфигурацию?',
+    confirmClearAll: 'Вы уверены, что хотите очистить всё?',
+    saveConfigSuccess: 'Конфигурация успешно сохранена!',
     customPath: 'Пользовательский путь',
     savedPaths: 'Сохранённые пути',
     shortenLinks: 'Создать короткие ссылки',
     ruleSelection: 'Выбор правил',
     ruleSelectionTooltip: 'Выберите нужные наборы правил',
+    copySubconverterUrl: 'Скопировать URL',
+    copiedSubconverterUrl: 'Скопировано!',
+    subconverterConfigTitle: 'Внешняя конфигурация Subconverter',
+    subconverterConfigDesc: 'Создайте URL внешней конфигурации Subconverter на основе выбранных правил и настроек выше.',
     custom: 'Пользовательский',
     minimal: 'Минимальный',
     balanced: 'Сбалансированный',
@@ -351,15 +537,18 @@ const translations = {
     addCustomRule: 'Добавить пользовательское правило',
     customRuleOutboundName: 'Имя выхода*',
     customRuleGeoSite: 'Правила Geo-Site',
-    customRuleGeoSiteTooltip: 'Правила Site в SingBox берутся из https://github.com/lyc8503/sing-box-rules, значит ваши пользовательские правила должны быть в этом репозитории',
+    customRuleGeoSiteTooltip: 'Правила Site в SingBox берутся из https://github.com/MetaCubeX/meta-rules-dat (ветка sing), значит ваши пользовательские правила должны быть в этом репозитории',
     customRuleGeoSitePlaceholder: 'например: google,anthropic',
     customRuleGeoIP: 'Правила Geo-IP',
-    customRuleGeoIPTooltip: 'Правила IP в SingBox берутся из https://github.com/lyc8503/sing-box-rules, значит ваши пользовательские правила должны быть в этом репозитории',
+    customRuleGeoIPTooltip: 'Правила IP в SingBox берутся из https://github.com/MetaCubeX/meta-rules-dat (ветка sing), значит ваши пользовательские правила должны быть в этом репозитории',
     customRuleGeoIPPlaceholder: 'например: private,cn',
     customRuleDomainSuffix: 'Суффикс домена',
     customRuleDomainSuffixPlaceholder: 'Суффиксы домена (через запятую)',
     customRuleDomainKeyword: 'Ключевые слова домена',
     customRuleDomainKeywordPlaceholder: 'Ключевые слова домена (через запятую)',
+    customRuleSrcIPCIDR: 'CIDR исходного IP',
+    customRuleSrcIPCIDRTooltip: 'Маршрутизация по исходному IP (Clash/OpenClash: SRC-IP-CIDR; Sing-Box: source_ip_cidr; Surge: поддерживает только одиночный IP, /32 будет преобразован в SRC-IP)',
+    customRuleSrcIPCIDRPlaceholder: 'CIDR исходного IP (через запятую)',
     customRuleIPCIDR: 'IP CIDR',
     customRuleIPCIDRPlaceholder: 'IP CIDR (через запятую)',
     customRuleProtocol: 'Тип протокола',
@@ -377,6 +566,10 @@ const translations = {
     convertToJSON: 'Конвертировать в JSON',
     convertToForm: 'Конвертировать в форму',
     validateJSON: 'Проверить JSON',
+    validateConfig: 'Проверить конфигурацию',
+    validJsonConfig: 'JSON-конфигурация корректна',
+    validYamlConfig: 'YAML-конфигурация корректна',
+    parserUnavailable: 'Парсер недоступен. Обновите страницу и попробуйте снова.',
     clearAll: 'Очистить всё',
     addJSONRule: 'Добавить правило JSON',
     noCustomRulesForm: 'Нажмите "Добавить пользовательское правило" чтобы начать создание правил',
@@ -413,62 +606,76 @@ const translations = {
       'Financial': '💰 Финансовые сервисы',
       'Cloud Services': '☁️ Облачные сервисы',
       'Non-China': '🌐 За пределами Китая',
+      'Manual Switch': '🖐️ Ручной выбор',
       'GLOBAL': 'GLOBAL'
     },
+    generalSettings: 'Общие настройки',
+    groupByCountry: 'Группировать по странам',
+    groupByCountryTip: 'Только для Clash/Surge/SingBox',
+    includeAutoSelect: 'Включить группу автовыбора',
     UASettings: 'Пользовательский UserAgent',
-    UAtip: 'По умолчанию используется curl/7.74.0'
+    UAtip: 'По умолчанию используется curl/7.74.0',
+    subscriptionLinks: 'Ссылки подписки',
+    universalLink: 'Универсальная ссылка (формат определяется по клиенту)',
+    xrayLink: 'Ссылка Xray (Base64)',
+    singboxLink: 'Ссылка SingBox',
+    clashLink: 'Ссылка Clash',
+    surgeLink: 'Ссылка Surge',
+    copied: 'Скопировано!',
+    shortening: 'Сокращение...',
+    alreadyShortened: 'Ссылки уже сокращены!',
+    shortenFailed: 'Не удалось сократить URL. Пожалуйста, попробуйте еще раз.',
+    customShortCode: 'Пользовательский короткий код',
+    optional: 'Необязательно',
+    customShortCodePlaceholder: 'Оставьте пустым для автогенерации или введите свой код',
+    showFullLinks: 'Показать полные ссылки',
+    noLinkProvided: 'Ссылка не предоставлена!',
+    scanQRCode: 'Сканировать QR-код',
+    tryShortLinks: 'Попробуйте использовать короткие ссылки!',
+    configSaved: 'Конфигурация успешно сохранена!',
+    configSaveFailed: 'Не удалось сохранить конфигурацию',
+    error: 'Ошибка: ',
+    validJSON: 'Действительный JSON',
+    rules: 'правила',
+    rule: 'Правило',
+    // UpdateChecker
+    newVersionAvailable: 'Доступна новая версия',
+    viewRelease: 'Посмотреть релиз',
+    updateGuide: 'Руководство по обновлению',
+    later: 'Позже'
   }
 };
 
-// 当前语言
-let currentLang = 'zh-CN';
-
-
-// 设置语言
-export function setLanguage(lang) {
-  if(translations[lang]) {
-    currentLang = lang;
-  } else if(checkStartsWith(lang, 'en')) {
-    currentLang = 'en-US';
-  } else if(checkStartsWith(lang, 'fa')) {
-    currentLang = 'fa';
-  } else if(checkStartsWith(lang, 'ru')) {
-    currentLang = 'ru';
+export function resolveLanguage(lang) {
+  if (translations[lang]) {
+    return lang;
+  } else if (checkStartsWith(lang, 'en')) {
+    return 'en-US';
+  } else if (checkStartsWith(lang, 'fa')) {
+    return 'fa';
+  } else if (checkStartsWith(lang, 'ru')) {
+    return 'ru';
   } else {
-    currentLang = 'zh-CN';
+    return 'zh-CN';
   }
 }
 
-// 获取翻译，支持嵌套键值访问
-export function t(key) {
-  const keys = key.split('.');
-  let value = translations[currentLang];
-  
-  // 逐级查找翻译值
-  for (const k of keys) {
-    value = value?.[k];
-    if (value === undefined) {
-      if (checkStartsWith(key, 'outboundNames.')) {
-        return key.split('.')[1];
+export function createTranslator(lang) {
+  const currentLang = resolveLanguage(lang);
+
+  return function t(key) {
+    const keys = key.split('.');
+    let value = translations[currentLang];
+
+    for (const k of keys) {
+      value = value?.[k];
+      if (value === undefined) {
+        if (checkStartsWith(key, 'outboundNames.')) {
+          return key.split('.')[1];
+        }
+        return key;
       }
-      // 找不到翻译时返回原始键名
-      return key;
     }
-  }
-  return value;
-}
-
-// 获取当前语言
-export function getCurrentLang() {
-  return currentLang;
-}
-
-// 获取默认规则列表
-export function getDefaultRules() {
-  return translations[currentLang].defaultRules;
-}
-
-// 获取出站集
-export function getOutbounds(){
-  return translations[currentLang].outboundNames;
+    return value;
+  };
 }
